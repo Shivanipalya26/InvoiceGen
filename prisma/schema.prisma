@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -40,4 +34,24 @@ model Session {
   userId        String
   expires_at    DateTime
   user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id            String  @id   @default(uuid())
+  recipient     String
+  subTotal      Float
+  tax           Float
+  total         Float
+  createdAt     DateTime      @default(now())
+  items         InvoiceItem[]
+}
+
+model InvoiceItem {
+  id            String  @id   @default(uuid())
+  invoiceId     String
+  name          String
+  quantity      Int
+  price         Float
+  total         Float
+  invoice       Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
