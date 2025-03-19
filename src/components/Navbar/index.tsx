@@ -65,7 +65,7 @@ const NavBar = () => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => signOut()} className="text-red-500 cursor-pointer flex items-center">
+            <DropdownMenuItem onClick={() => signOut({ })} className="text-red-500 cursor-pointer flex items-center">
               <LogOut className="h-4 w-4 mr-2" /> Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

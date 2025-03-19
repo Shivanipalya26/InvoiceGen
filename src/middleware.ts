@@ -5,13 +5,20 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!session && req.nextUrl.pathname.startsWith("/invoice")) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  if (!session) {
+    const protectedRoutes = ["/invoice", "/dashboard"];
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      req.nextUrl.pathname.startsWith(route)
+    );
+
+    if (isProtectedRoute) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/invoice"],
+  matcher: ["/invoice/:path*", "/dashboard/:path*"], 
 };
