@@ -5,6 +5,8 @@ import { useReactToPrint } from "react-to-print";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import EmailInvoice from "../EmailInvoice";
+import { toast } from "react-toastify";
 
 const Invoice = () => {
   const router = useRouter();
@@ -39,6 +41,7 @@ const Invoice = () => {
   const currencySymbol = currencySymbols[currency] || "$";
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [emailOpen, setEmailOpen] = useState(false); 
 
   const onSaveInvoice = async (data: any) => {
     setLoading(true);
@@ -62,11 +65,11 @@ const Invoice = () => {
 
       if (!response.ok) throw new Error("Failed to save invoice");
 
-      alert("Invoice saved successfully!");
-      reset(); // Reset form after saving
+      toast.success("Invoice saved successfully!");
+      reset();  
     } catch (error) {
       console.error(error);
-      alert("Error saving invoice");
+      toast.error("Error saving invoice");
     } finally {
       setLoading(false);
     }
@@ -75,7 +78,7 @@ const Invoice = () => {
   return (
     <section className="min-h-screen">
       <div className="flex flex-col md:flex-row gap-6 p-10 mt-20">
-        <Card className="p-6 w-full md:w-1/2 bg-white shadow">
+        <Card className="p-6 w-full md:w-1/2 shadow">
           <h2 className="text-2xl font-bold mb-4">Create Invoice</h2>
           <form onSubmit={handleSubmit(onSaveInvoice)} className="space-y-4">
             <input {...register("number")} className="w-full p-2 border rounded" placeholder="Invoice Number" />
@@ -126,17 +129,17 @@ const Invoice = () => {
           </form>
         </Card>
 
-        <Card className="p-6 w-full md:w-1/2 bg-gray-100 shadow">
+        <Card className="p-6 w-full md:w-1/2 shadow">
           <h2 className="text-2xl font-bold mb-4">Invoice Preview</h2>
-          <div ref={invoiceRef} className="bg-white p-4 rounded shadow">
+          <div ref={invoiceRef} className=" p-4 rounded shadow">
             <p className="font-semibold">Invoice: {watch("number")}</p>
-            <p className="text-gray-600">Date: {watch("date")}</p>
-            <p className="text-gray-600">Sender: {watch("sender")}</p>
-            <p className="text-gray-600">Receiver: {watch("receiver")}</p>
+            <p className="text-gray-600 dark:text-white">Date: {watch("date")}</p>
+            <p className="text-gray-600 dark:text-white">Sender: {watch("sender")}</p>
+            <p className="text-gray-600 dark:text-white">Receiver: {watch("receiver")}</p>
 
             <table className="w-full mt-4 border">
               <thead>
-                <tr className="bg-gray-200">
+                <tr className="">
                   <th className="p-2">Description</th>
                   <th className="p-2">Qty</th>
                   <th className="p-2">Price</th>
@@ -170,10 +173,16 @@ const Invoice = () => {
 
           <div className="flex justify-center">
             <Button onClick={() => handlePrint()} className="mt-4 mr-4">Download PDF</Button>
-            <Button onClick={() => router.push("/email")} className="mt-4">Send Mail</Button>
+            <Button onClick={() => setEmailOpen(true)} className="mt-4">Send Mail</Button>
           </div>
         </Card>
       </div>
+      <EmailInvoice
+        recipient={watch("receiver")}
+        total={total.toFixed(2)}
+        open={emailOpen}
+        setOpen={setEmailOpen}
+      />
     </section>
   );
 };

@@ -1,11 +1,20 @@
-'use client'
+"use client";
 import { useEffect, useState } from "react";
 import { Menu, BarChart, User, Settings, LogOut, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+type Invoice = {
+  id: string;
+  recipient: string;
+  subTotal: number;
+  tax: number;
+  total: number;
+  createdAt: string;
+};
+
+const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) => {
   return (
     <div className={`fixed top-0 left-0 h-full bg-gray-900 text-white w-64 p-5 transition-transform ${isOpen ? "translate-x-0" : "-translate-x-64"}`}>
       <div className="flex justify-between items-center mb-6">
@@ -23,10 +32,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 };
 
 export default function Dashboard() {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [invoices, setInvoices] = useState([]);
+  const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
+  // Dummy chart data
   const data = [
     { name: "Jan", value: 400 },
     { name: "Feb", value: 600 },
@@ -47,17 +58,20 @@ export default function Dashboard() {
     const fetchInvoices = async () => {
       try {
         const response = await fetch("/api/invoice");
-        const data = await response.json();
-        setInvoices(data.invoices);
+        const jsonData = await response.json();
+        
+        const invoicesArray: Invoice[] = jsonData.invoices;  
+        setInvoices(invoicesArray);
       } catch (error) {
         console.error("Failed to fetch invoices:", error);
       }
     };
     fetchInvoices();
   }, []);
+  
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-black">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="flex-1 p-6 md:ml-64">
         <div className="flex justify-between items-center mb-6">
@@ -103,32 +117,38 @@ export default function Dashboard() {
           </Card>
 
           <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">Invoices</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="p-3">Recipient</th>
-                  <th className="p-3">Subtotal</th>
-                  <th className="p-3">Tax</th>
-                  <th className="p-3">Total</th>
-                  <th className="p-3">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-t hover:bg-gray-100 transition">
-                    <td className="p-3">{invoice.recipient}</td>
-                    <td className="p-3">${invoice.subTotal.toFixed(2)}</td>
-                    <td className="p-3">${invoice.tax.toFixed(2)}</td>
-                    <td className="p-3 font-bold text-green-600">${invoice.total.toFixed(2)}</td>
-                    <td className="p-3">{new Date(invoice.createdAt).toLocaleDateString()}</td>
+            <h2 className="text-2xl font-bold mb-4">Invoices</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full bg-white dark:bg-gray-900 shadow-md rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-gray-200 dark:bg-gray-800">
+                    <th className="p-3">Recipient</th>
+                    <th className="p-3">Subtotal</th>
+                    <th className="p-3">Tax</th>
+                    <th className="p-3">Total</th>
+                    <th className="p-3">Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {invoices.length > 0 ? (
+                    invoices.map((invoice) => (
+                      <tr key={invoice.id} className="border-t hover:bg-gray-100 transition">
+                        <td className="p-3">{invoice.recipient}</td>
+                        <td className="p-3">${invoice.subTotal.toFixed(2)}</td>
+                        <td className="p-3">${invoice.tax.toFixed(2)}</td>
+                        <td className="p-3 font-bold text-green-600">${invoice.total.toFixed(2)}</td>
+                        <td className="p-3">{new Date(invoice.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="text-center p-3">No invoices available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
