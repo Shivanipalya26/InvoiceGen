@@ -3,14 +3,29 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Home, LogOut, Menu, Plus, Settings, Users, X } from "lucide-react";
+import {
+  FileText,
+  Home,
+  LogOut,
+  Menu,
+  Plus,
+  Settings,
+  Users,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import ThemeToggler from "../Theme/theme-toogler";
 
 const routes = [
   { label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -20,8 +35,8 @@ const routes = [
 ];
 
 const NavBar = () => {
-  const { data: session } = useSession()
-  const user = session?.user
+  const { data: session } = useSession();
+  const user = session?.user;
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -51,31 +66,43 @@ const NavBar = () => {
       </div>
 
       <div className="flex  items-center gap-x-2">
+
+      <ThemeToggler />
         {!user ? (
           <Link href={"/login"}>
-          <Button size="sm" className="hover: cursor-pointer">Log In</Button>
-          </Link> 
+            <Button size="sm" className="hover: cursor-pointer">
+              Log In
+            </Button>
+          </Link>
         ) : (
           <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Avatar className="cursor-pointer">
-              <AvatarImage src={session.user?.image || ""} alt={session.user?.name || "User"} />
-              <AvatarFallback>{session.user?.name?.charAt(0) || "U"}</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="cursor-pointer">
+                <AvatarImage
+                  src={session.user?.image || ""}
+                  alt={session.user?.name || "User"}
+                />
+                <AvatarFallback>
+                  {session.user?.name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => signOut({ })} className="text-red-500 cursor-pointer flex items-center">
-              <LogOut className="h-4 w-4 mr-2" /> Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                onClick={() => signOut({})}
+                className="text-red-500 cursor-pointer flex items-center"
+              >
+                <LogOut className="h-4 w-4 mr-2" /> Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
-        
+
         <Link href={"/invoice"}>
-        <Button size="sm" className="hidden md:flex">
-          <Plus className="h-4 w-4 mr-2" /> New Invoice
-        </Button>
+          <Button size="sm" className="hidden md:flex">
+            <Plus className="h-4 w-4 mr-2" /> New Invoice
+          </Button>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -122,7 +149,9 @@ const NavBar = () => {
                 </Link>
               ))}
               <Link href={"/login"}>
-              <Button className="mt-4 w-full hover: cursor-pointer">Log In</Button>
+                <Button className="mt-4 w-full hover: cursor-pointer">
+                  Log In
+                </Button>
               </Link>
               <Button className="mt-4 w-full">
                 <Plus className="h-4 w-4 mr-2" /> New Invoice

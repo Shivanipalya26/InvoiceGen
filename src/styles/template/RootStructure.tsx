@@ -3,6 +3,7 @@
 import Footer from "@/components/Footer";
 import NavBar from "@/components/Navbar";
 import { FC, ReactNode } from "react"
+import { ToastContainer } from 'react-toastify';
 
 interface LayoutProps {
     children: ReactNode;
@@ -14,6 +15,7 @@ const RootStructure: FC<LayoutProps> = ({ children }) => {
             <NavBar />
                 <div>{ children }</div>
             <Footer />
+            <ToastContainer />
         </div>
     )
 }
